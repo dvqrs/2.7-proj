@@ -63,12 +63,19 @@ def handle_client(client_socket, address):
                     continue
                 else:
                     response = "Screenshot not found"
-            elif request.upper() == "EXIT":
-                response = "Server closing connection"
-                client_socket.sendall(f"{str(len(response)).zfill(4)}{response}".encode())
-                break
-            else:
-                response = "invalid command"
+            elif request.upper().startswith("NEW_FILE"):
+                    name = request[8:].strip()
+                    if not name:
+                        response = "Error: File name is empty"
+                    else:
+                        file_path = os.path.join("C:\\Temp\\", name)
+                        if not os.path.exists("C:\\Temp\\"):
+                            os.makedirs("C:\\Temp\\")
+                        try:
+                            with open(file_path, 'w') as new_file:
+                                response = f"File {name} created successfully at {file_path}"
+                        except Exception as e:
+                            response = f"Error: {e}"
 
             full_message = f"{str(len(response)).zfill(4)}{response}"
             client_socket.sendall(full_message.encode())
